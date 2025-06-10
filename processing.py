@@ -1,16 +1,15 @@
-import PyPDF2
+
+import fitz
 import nltk
 import re
 import os
-import tkinter as tk
 def read_pdf_text(path):
-    with open(path, 'rb') as file:
-        reader = PyPDF2.PdfReader(file)
-        text = ''
-        for page in reader.pages:
-            text += page.extract_text() + ' '
+    with fitz.open("document.pdf") as doc:
+        text = ""
+        for page in doc:
+            text += page.get_text()
     return text
-def stopword_removal(word):
+def stopword_removal(words):
     stopwords = [
         "እኔ", "አንቺ", "አንተ", "እሱ", "እሷ", "እኛ", "እናንተ", "እነሱ",
         "ይህ", "ያ", "የዚህ", "የዛ", "ይሄ", "እነዚህ", "እነዚያ",
@@ -22,15 +21,16 @@ def stopword_removal(word):
         "ያን", "እርሱ", "እርሷ", "ያች", "ያንን", "አሁን", "በዚህ",
         "ያም", "እኔም", "እርስዎ", "ያህል", "እዚያ", "በዚያ", "በዚህም"
     ]
-    newword=list()
+    newword=list() # storing non - stop words
     count=0
-    Collection = list()
-    for w in word :
+    knownstopwords = list() # storing known stop words
+    for w in words :
         if w not in stopwords:
             newword.append(w)
             count += 1
-    Collection.extend([count ,newword])
-    return Collection
+        else:
+            knownstopwords.append(w)
+    return newword
 def normalization(word):
     text = re.sub(r'[።፣፤፥፦፧""]', '', word)
     text = re.sub(r'\s+', ' ', word).strip()
@@ -40,7 +40,8 @@ def tokenization(word):
     parts = re.split(r'[]', word)# add amharic words
     clean=[s.strip() for s in parts if s.strip()]
     return clean
-def stemming(word):
-    pass
+
+
 document = input("Give me a document as path: ")
 String = read_pdf_text(document)
+print(String)
